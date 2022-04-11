@@ -1,63 +1,117 @@
 # frozen_string_literal: true
 
-# TODO : fix this
-# creates a Truck that is parked in Neighbourhood
-class Truck
-  attr_reader :x_coordinate, :y_coordinate, :direction
+require './truck_error'
 
-  NORTH = 'north'
-  SOUTH = 'south'
-  EAST = 'east'
-  WEST = 'west'
+# Bin Truck class
+class BinTruck
+  attr_reader :x_coor, :y_coor, :direction
 
-  direction_list = [NORTH, EAST, SOUTH, WEST]
+  NORTH = 'NORTH'
+  SOUTH = 'SOUTH'
+  EAST = 'EAST'
+  WEST = 'WEST'
+
+  DIRECTION_LIST = [NORTH, EAST, SOUTH, WEST].freeze
+  UPPER_BORDER = 6
+  LOWER_BORDER = 0
+  MOVEMENT_UNIT = 1
+  BIN_DISTANCE_UNIT = 1
+  DIRECTIONS_NUMBER = 4
 
   def initialize
-    @x_coordinate = 0
-    @y_coordinate = 0
+    @x_coor = -1
+    @y_coor = -1
     @direction = NORTH
+    @inside_area = false
   end
 
-  def park(x_coordinate, y_coordinate, direction)
-    if x_coordinate.negative? || x_coordinate > 6 || y_coordinate.negative? || y_coordinate > 6
-      raise 'Cannot park beyond the Neighbourhood'
-    end
+  def park(x_coor, y_coor, direction)
+    raise TruckError::InvalidPosition, 'ERROR: Cannot park outside the neighborhood' if outside_area?(x_coor, y_coor)
+    raise TruckError::InvalidDirection, 'ERROR: Invalid direction' unless DIRECTION_LIST.include?(direction)
 
-    @x_coordinate = x_coordinate
-    @y_coordinate = y_coordinate
+    @x_coor = x_coor
+    @y_coor = y_coor
     @direction = direction
-    [@x_coordinate, @y_coordinate]
+    @inside_area = true
+    self
   end
 
   def drive
-    raise 'Cannot go beyond the Neighbourhood' if border_coordinate?
+    validate_position
+    raise TruckError::InvalidMovement, 'ERROR: Cannot move beyond the neighborhood' if facing_to_borderline?
 
-    case @direction
-    when NORTH
-      @y_coordinate += 1
-    when SOUTH
-      @y_coordinate -= 1
-    when EAST
-      @x_coordinate += 1
-    when WEST
-      @x_coordinate -= 1
-    end
+    @y_coor += MOVEMENT_UNIT if facing?(NORTH)
+    @y_coor -= MOVEMENT_UNIT if facing?(SOUTH)
+    @x_coor += MOVEMENT_UNIT if facing?(EAST)
+    @x_coor -= MOVEMENT_UNIT if facing?(WEST)
+    self
   end
 
   def turn_right
-    @direction = direction_list.at((direction_list.find_index(@direction) + 1) % 4)
+    validate_position
+
+    @direction = DIRECTION_LIST.at((DIRECTION_LIST.find_index(@direction) + 1) % DIRECTIONS_NUMBER)
+    self
   end
 
   def turn_left
-    @direction = direction_list.at((direction_list.find_index(@direction) - 1) % 4)
+    validate_position
+
+    @direction = DIRECTION_LIST.at((DIRECTION_LIST.find_index(@direction) - 1) % DIRECTIONS_NUMBER)
+    self
+  end
+
+  def pickup # rubocop:disable Metrics/CyclomaticComplexity
+    validate_position
+    raise TruckError::BinOutofArea, 'Bin is out of the neighborhood' if bin_outside_area?
+
+    bin_x_coor = @x_coor - BIN_DISTANCE_UNIT if facing?(NORTH)
+    bin_x_coor = @x_coor + BIN_DISTANCE_UNIT if facing?(SOUTH)
+    bin_y_coor = @y_coor - BIN_DISTANCE_UNIT if facing?(EAST)
+    bin_y_coor = @y_coor + BIN_DISTANCE_UNIT if facing?(WEST)
+
+    [bin_x_coor || @x_coor, bin_y_coor || @y_coor]
+  end
+
+  def call_central
+    validate_position
+
+    puts "#{@x_coor}, #{@y_coor}, #{@direction}"
   end
 
   private
 
-  def border_coordinate? # rubocop:disable Metrics/CyclomaticComplexity
-    @x_coordinate.zero? && @direction == WEST ||
-      @x_coordinate == 6 && @direction == EAST ||
-      @y_coordinate.zero? && @direction == SOUTH ||
-      @y_coordinate == 6 && @direction == NORTH
+  def facing_to_borderline?
+    in_border_with_direction?(@x_coor, LOWER_BORDER, WEST) ||
+      in_border_with_direction?(@x_coor, UPPER_BORDER, EAST) ||
+      in_border_with_direction?(@y_coor, LOWER_BORDER, SOUTH) ||
+      in_border_with_direction?(@y_coor, UPPER_BORDER, NORTH)
+  end
+
+  def bin_outside_area?
+    in_border_with_direction?(@x_coor, LOWER_BORDER, NORTH) ||
+      in_border_with_direction?(@y_coor, UPPER_BORDER, EAST) ||
+      in_border_with_direction?(@x_coor, UPPER_BORDER, SOUTH) ||
+      in_border_with_direction?(@y_coor, LOWER_BORDER, WEST)
+  end
+
+  def validate_position
+    raise TruckError::InvalidPosition, 'ERROR: Need to be in the neighborhood before start moving' unless inside_area?
+  end
+
+  def outside_area?(x_coor, y_coor)
+    x_coor.negative? || x_coor > UPPER_BORDER || y_coor.negative? || y_coor > UPPER_BORDER
+  end
+
+  def inside_area?
+    @inside_area
+  end
+
+  def facing?(direction)
+    @direction == direction
+  end
+
+  def in_border_with_direction?(coor_type, border_type, direction)
+    coor_type == border_type && facing?(direction)
   end
 end
