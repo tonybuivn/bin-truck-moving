@@ -1,0 +1,8 @@
+ERROR: Need to be in the neighborhood before start moving
+ERROR: Need to be in the neighborhood before start moving
+ERROR: Need to be in the neighborhood before start moving
+ERROR: Need to be in the neighborhood before start moving
+0, 1, WEST
+ERROR: Cannot move beyond the neighborhood
+ERROR: Bin is out of the neighborhood
+BIN PICKED AT 0, 2
