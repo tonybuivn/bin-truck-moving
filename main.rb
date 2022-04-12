@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 require_relative 'classes/bin_truck'
+require_relative 'classes/neighborhood'
 require './truck_error'
 require 'pry'
 
-bin_truck = BinTruck.new
+neighborhood = Neighborhood.new(6, 0)
+bin_truck = BinTruck.new(neighborhood)
 
 loop do # rubocop:disable Metrics/BlockLength
   puts

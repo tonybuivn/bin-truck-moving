@@ -4,7 +4,7 @@ require './truck_error'
 
 # Bin Truck class
 class BinTruck
-  attr_reader :x_coor, :y_coor, :direction
+  attr_reader :x_coor, :y_coor, :direction, :neighborhood
 
   NORTH = 'NORTH'
   SOUTH = 'SOUTH'
@@ -12,15 +12,14 @@ class BinTruck
   WEST = 'WEST'
 
   DIRECTION_LIST = [NORTH, EAST, SOUTH, WEST].freeze
-  UPPER_BORDER = 6
-  LOWER_BORDER = 0
+  DIRECTIONS_NUMBER = 4
   MOVEMENT_UNIT = 1
   BIN_DISTANCE_UNIT = 1
-  DIRECTIONS_NUMBER = 4
 
-  def initialize
+  def initialize(neighborhood)
     @x_coor = -1
     @y_coor = -1
+    @neighborhood = neighborhood
     @direction = NORTH
     @inside_area = false
   end
@@ -82,17 +81,17 @@ class BinTruck
   private
 
   def facing_to_borderline?
-    in_border_with_direction?(@x_coor, LOWER_BORDER, WEST) ||
-      in_border_with_direction?(@x_coor, UPPER_BORDER, EAST) ||
-      in_border_with_direction?(@y_coor, LOWER_BORDER, SOUTH) ||
-      in_border_with_direction?(@y_coor, UPPER_BORDER, NORTH)
+    in_border_with_direction?(@x_coor, neighborhood.lower_border, WEST) ||
+      in_border_with_direction?(@x_coor, neighborhood.upper_border, EAST) ||
+      in_border_with_direction?(@y_coor, neighborhood.lower_border, SOUTH) ||
+      in_border_with_direction?(@y_coor, neighborhood.upper_border, NORTH)
   end
 
   def bin_outside_area?
-    in_border_with_direction?(@x_coor, LOWER_BORDER, NORTH) ||
-      in_border_with_direction?(@y_coor, UPPER_BORDER, EAST) ||
-      in_border_with_direction?(@x_coor, UPPER_BORDER, SOUTH) ||
-      in_border_with_direction?(@y_coor, LOWER_BORDER, WEST)
+    in_border_with_direction?(@x_coor, neighborhood.lower_border, NORTH) ||
+      in_border_with_direction?(@y_coor, neighborhood.upper_border, EAST) ||
+      in_border_with_direction?(@x_coor, neighborhood.upper_border, SOUTH) ||
+      in_border_with_direction?(@y_coor, neighborhood.lower_border, WEST)
   end
 
   def validate_position
@@ -100,7 +99,10 @@ class BinTruck
   end
 
   def outside_area?(x_coor, y_coor)
-    x_coor.negative? || x_coor > UPPER_BORDER || y_coor.negative? || y_coor > UPPER_BORDER
+    x_coor < neighborhood.lower_border ||
+      x_coor > neighborhood.upper_border ||
+      y_coor < neighborhood.lower_border ||
+      y_coor > neighborhood.upper_border
   end
 
   def inside_area?

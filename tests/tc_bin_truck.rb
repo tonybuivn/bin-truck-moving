@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require './classes/bin_truck'
+require './classes/neighborhood'
 require './truck_error'
 require 'test/unit'
 require 'pry'
@@ -8,7 +9,8 @@ require 'pry'
 # Unit-test for BinTruck Class
 class TestBinTruck < Test::Unit::TestCase
   def setup
-    @bin_truck = BinTruck.new
+    neighborhood = Neighborhood.new(6, 0)
+    @bin_truck = BinTruck.new(neighborhood)
   end
 
   def test_initialization
