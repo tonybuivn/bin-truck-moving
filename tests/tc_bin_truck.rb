@@ -9,8 +9,7 @@ require 'pry'
 # Unit-test for BinTruck Class
 class TestBinTruck < Test::Unit::TestCase
   def setup
-    neighborhood = Neighborhood.new(6, 0)
-    @bin_truck = BinTruck.new(neighborhood)
+    @bin_truck = BinTruck.new(Neighborhood.new(6, 0))
   end
 
   def test_initialization
