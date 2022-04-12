@@ -81,17 +81,17 @@ class BinTruck
   private
 
   def facing_to_borderline?
-    in_border_with_direction?(@x_coor, neighborhood.lower_border, WEST) ||
-      in_border_with_direction?(@x_coor, neighborhood.upper_border, EAST) ||
-      in_border_with_direction?(@y_coor, neighborhood.lower_border, SOUTH) ||
-      in_border_with_direction?(@y_coor, neighborhood.upper_border, NORTH)
+    in_border_with_direction?(@x_coor, @neighborhood.lower_border, WEST) ||
+      in_border_with_direction?(@x_coor, @neighborhood.upper_border, EAST) ||
+      in_border_with_direction?(@y_coor, @neighborhood.lower_border, SOUTH) ||
+      in_border_with_direction?(@y_coor, @neighborhood.upper_border, NORTH)
   end
 
   def bin_outside_area?
-    in_border_with_direction?(@x_coor, neighborhood.lower_border, NORTH) ||
-      in_border_with_direction?(@y_coor, neighborhood.upper_border, EAST) ||
-      in_border_with_direction?(@x_coor, neighborhood.upper_border, SOUTH) ||
-      in_border_with_direction?(@y_coor, neighborhood.lower_border, WEST)
+    in_border_with_direction?(@x_coor, @neighborhood.lower_border, NORTH) ||
+      in_border_with_direction?(@y_coor, @neighborhood.upper_border, EAST) ||
+      in_border_with_direction?(@x_coor, @neighborhood.upper_border, SOUTH) ||
+      in_border_with_direction?(@y_coor, @neighborhood.lower_border, WEST)
   end
 
   def validate_position
@@ -99,10 +99,10 @@ class BinTruck
   end
 
   def outside_area?(x_coor, y_coor)
-    x_coor < neighborhood.lower_border ||
-      x_coor > neighborhood.upper_border ||
-      y_coor < neighborhood.lower_border ||
-      y_coor > neighborhood.upper_border
+    x_coor < @neighborhood.lower_border ||
+      x_coor > @neighborhood.upper_border ||
+      y_coor < @neighborhood.lower_border ||
+      y_coor > @neighborhood.upper_border
   end
 
   def inside_area?
