@@ -62,12 +62,12 @@ class BinTruck
 
   def pickup # rubocop:disable Metrics/CyclomaticComplexity
     validate_position
-    raise TruckError::BinOutofArea, 'Bin is out of the neighborhood' if bin_outside_area?
+    raise TruckError::BinOutofArea, 'ERROR: Bin is out of the neighborhood' if bin_outside_area?
 
     bin_x_coor = @x_coor - BIN_DISTANCE_UNIT if facing?(NORTH)
     bin_x_coor = @x_coor + BIN_DISTANCE_UNIT if facing?(SOUTH)
-    bin_y_coor = @y_coor - BIN_DISTANCE_UNIT if facing?(EAST)
-    bin_y_coor = @y_coor + BIN_DISTANCE_UNIT if facing?(WEST)
+    bin_y_coor = @y_coor + BIN_DISTANCE_UNIT if facing?(EAST)
+    bin_y_coor = @y_coor - BIN_DISTANCE_UNIT if facing?(WEST)
 
     [bin_x_coor || @x_coor, bin_y_coor || @y_coor]
   end
